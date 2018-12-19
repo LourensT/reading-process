@@ -3,6 +3,8 @@ import pandas as pd
 from pandas import ExcelWriter
 from pandas import ExcelFile
 import os
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def LogBook(filepath):
@@ -13,7 +15,7 @@ def LogBook(filepath):
     progress = book[book.columns[1]].tolist()
 
     response['dates'] = book[book.columns[0]].tolist()
-    response['progess'] = book[book.columns[1]].tolist()
+    response['progress'] = book[book.columns[1]].tolist()
 
     title = filepath[int(filepath.rfind('\\')+1) : -5]
     response['title'] = title
@@ -36,6 +38,14 @@ def AllBooks(startdir = 'logs\\'):
         Logs.append(LogBook(item))
 
     return Logs
-#a = LogBook('C:\\Projects\\reading-process\\logs\\Angela_s Ashes - Frankie McCourt.xlsx')
-#print(a)
-print(AllBooks())
+
+def AddToPLot(book):
+    plt.plot(book['dates'],book['progress'])
+
+def ShowPlot():
+    plt.show()
+
+all_data = AllBooks()
+for item in all_data:
+    AddToPLot(item)
+ShowPlot()
