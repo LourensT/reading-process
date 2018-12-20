@@ -14,8 +14,11 @@ def LogBook(filepath):
     dates = book[book.columns[0]].tolist()
     progress = book[book.columns[1]].tolist()
 
-    response['dates'] = book[book.columns[0]].tolist()
-    response['progress'] = book[book.columns[1]].tolist()
+    first_date = dates[0] - pd.Timedelta('1 days')
+    first_progress = 0
+
+    response['dates'] = [first_date] + book[book.columns[0]].tolist()
+    response['progress'] = [first_progress] + book[book.columns[1]].tolist()
 
     title = filepath[int(filepath.rfind('\\')+1) : -5]
     response['title'] = title
@@ -43,9 +46,15 @@ def AddToPLot(book):
     plt.plot(book['dates'],book['progress'])
 
 def ShowPlot():
+    plt.grid(True)
+    plt.title(label='Progress per book over time')
+    plt.xlabel(xlabel='Time')
+    plt.ylabel(ylabel='Pages')
     plt.show()
+    #plt.
 
 all_data = AllBooks()
+#print(all_data)
 for item in all_data:
     AddToPLot(item)
 ShowPlot()
