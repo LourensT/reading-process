@@ -78,11 +78,28 @@ def AddToPLot(book):
     else:
         print('skipped: ' + book['title'] + 'it\'s out of sync')
 
+def AddAnEvent(date, label):
+    plt.axvline(x=(date+pd.Timedelta('4 days')), color='k', linestyle='--', label=label,alpha=0.3)
+    plt.text(date,900,label,rotation=90, alpha=0.5, fontsize='x-small')
+
+def AddEvents():
+    events = [(pd.Timestamp(year=2018, month=5, day=24), 'End CE Examperiod'),
+            (pd.Timestamp(year=2018, month=8, day=20), 'Moved out for uni'),
+            (pd.Timestamp(year=2018, month=3, day=20), 'End Examweek'),
+            (pd.Timestamp(year=2017, month=12, day=31), 'Spending new years eve sick in bed'),
+            (pd.Timestamp(year=2018, month=8, day=8), 'Return travel with parents'),
+            (pd.Timestamp(year=2018, month=6, day=9), 'Return trip with friends'),
+            (pd.Timestamp(year=2018, month=11, day=5), 'End Examperiod')
+            ]
+    for event in events:
+        AddAnEvent(event[0], event[1])
+
 def ShowPlot():
     plt.grid(True)
     plt.title(label='Progress per book over time')
     plt.xlabel(xlabel='Time')
     plt.ylabel(ylabel='Pages')
+    plt.xlim(pd.Timestamp(year=2017, month=12, day=14), pd.Timestamp(year=2018, month=12, day=20))
     plt.show()
     #plt.
 
@@ -90,6 +107,7 @@ all_data = AllBooks()
 print('Books Loaded and Processed')
 print('\n')
 #print(all_data)
+AddEvents()
 for item in all_data:
     AddToPLot(item)
 ShowPlot()
