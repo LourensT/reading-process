@@ -43,10 +43,12 @@ def LogBook(filepath):
     if InSync:
         response['dates'] = dates_interpolated
         response['progress'] = progress_interpolated
+        response['index'] = np.arange(len(progress_interpolated))
         response['InSync'] = True
     else:
         response['dates'] = dates_interpolated
         response['progress'] = progress_interpolated
+        response['index'] = np.arange(len(progress_interpolated))
         response['InSync'] = False
 
     title = filepath[int(filepath.rfind('\\')+1) : -5]
@@ -94,6 +96,32 @@ def AddEvents():
     for event in events:
         AddAnEvent(event[0], event[1])
 
+
+def ComparePlot(all_data):
+    for book in all_data:
+        if book['InSync']:
+            plt.plot(book['index'],book['progress'])
+            print('plotted: ' + book['title'])
+        else:
+            print('skipped: ' + book['title'] + 'it\'s out of sync')
+    plt.grid(False)
+    plt.title(label='Progress per book over time, compared')
+    plt.xlabel(xlabel='Days')
+    plt.ylabel(ylabel='Pages')
+    plt.show()
+
+def TotalPages(data):
+    total = 0
+    for item in data:
+        if isinstance(item['progress'][-1], int):
+            total += item['progress'][-1]
+
+    return total
+
+def CalculateStats(alldata):
+    print('Statistics:')
+    print(str(TotalPages(alldata)) + ' pages in total' )
+
 def ShowPlot():
     plt.grid(True)
     plt.title(label='Progress per book over time')
@@ -106,8 +134,12 @@ def ShowPlot():
 all_data = AllBooks()
 print('Books Loaded and Processed')
 print('\n')
+#CalculateStats(all_data)
+ComparePlot(all_data)
+'''
 #print(all_data)
 AddEvents()
 for item in all_data:
     AddToPLot(item)
 ShowPlot()
+'''
