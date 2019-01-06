@@ -187,9 +187,24 @@ def TotalPages(data):
 
     return total
 
+def AverageBook(data):
+    total = 0
+    days = 0
+    for item in data:
+        days += len(item['progress'])
+        if isinstance(item['progress'][-1], int):
+            total += item['progress'][-1]
+
+    avg_days = days / len(data)
+    avg_pages = total / len(data)
+
+    return avg_days, avg_pages
+
 def CalculateStats(alldata):
     print('Statistics:')
     print(str(TotalPages(alldata)) + ' pages in total' )
+    print(str(AverageBook(alldata)[1]) + 'average pages per book' )
+    print(str(AverageBook(alldata)[1]) + 'average days per book' )
 
 def ShowPlot(which=0):
     if which == 0:
