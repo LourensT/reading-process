@@ -54,6 +54,7 @@ def LogBook(filepath):
     title = filepath[int(filepath.rfind('\\')+1) : -5]
     response['title'] = title
     response['finished'] = dates[-1]
+    response['length'] = progress[-1]
 
     return response
 
@@ -96,6 +97,45 @@ def AddEvents():
     for event in events:
         AddAnEvent(event[0], event[1])
 
+def AveragePlot(all_data):
+    daysperbook = 0
+    for item in all_data:
+        daysperbook += len(item['progress'])
+    averagedays = int(daysperbook/len(all_data))
+
+    index = np.arange(averagedays)
+
+    averageprogress = []
+    for i in range(0, averagedays):
+        dayprogress = 0
+        amountofbooks = 0
+        #print(i)
+        for item in all_data:
+            if len(item['progress']) > i:
+                if isinstance(item['progress'][i], float):
+                    print(item['title'])
+                dayprogress += item['progress'][i]
+                amountofbooks += 1
+        print(i, amountofbooks, dayprogress)
+        averageprogress.append(int(dayprogress/amountofbooks))
+
+    for book in all_data:
+        if book['InSync']:
+            plt.plot(book['index'],book['progress'], alpha=0.2, color='grey')
+            print('plotted: ' + book['title'])
+        else:
+            print('skipped: ' + book['title'] + 'it\'s out of sync')
+
+    print(index)
+    print(averageprogress)
+    plt.plot(index,averageprogress, color='black')
+
+    plt.grid(False)
+    plt.title(label='Average Book Progress')
+    plt.xlabel(xlabel='Days')
+    plt.ylabel(ylabel='Pages')
+    plt.show()
+
 
 def ComparePlot(all_data):
     for book in all_data:
@@ -135,7 +175,8 @@ all_data = AllBooks()
 print('Books Loaded and Processed')
 print('\n')
 #CalculateStats(all_data)
-ComparePlot(all_data)
+#ComparePlot(all_data)
+AveragePlot(all_data)
 '''
 #print(all_data)
 AddEvents()
