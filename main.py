@@ -204,7 +204,7 @@ def CalculateStats(alldata):
     print('Statistics:')
     print(str(TotalPages(alldata)) + ' pages in total' )
     print(str(AverageBook(alldata)[1]) + 'average pages per book' )
-    print(str(AverageBook(alldata)[1]) + 'average days per book' )
+    print(str(AverageBook(alldata)[0]) + 'average days per book' )
 
 def ShowPlot(which=0):
     if which == 0:
@@ -261,8 +261,8 @@ all_data.sort(key=FirstDate)
 
 print('Books Loaded and Processed')
 print('\n')
-#CalculateStats(all_data)
-ComparePlot(all_data)
+CalculateStats(all_data)
+#ComparePlot(all_data)
 #AveragePlot(all_data)
 
 #print(all_data)
