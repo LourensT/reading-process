@@ -25,12 +25,14 @@ for i in range(len(tableau20)):
     tableau20[i] = (r / 255., g / 255., b / 255.)
 
 def LogBook(filepath):
+    print(filepath)
     response = {}
 
-    book = pd.read_excel(filepath, sheet_name='Blad1')
+    book = pd.read_excel(filepath, sheet_name='Blad1', header=None)
     dates = book[book.columns[0]].tolist()
     progress = book[book.columns[1]].tolist()
 
+    print(book)
     first_date = dates[0] - pd.Timedelta('1 days')
     first_progress = 0
     dates = [first_date] + dates
@@ -46,6 +48,7 @@ def LogBook(filepath):
             while (dates[i+1] != iterator_date):
                 dates_interpolated.append(iterator_date)
                 progress_interpolated.append(progress[i])
+                print(iterator_date)
                 iterator_date = iterator_date + pd.Timedelta('1 days')
 
     if (len(dates_interpolated) != len(progress_interpolated)):
@@ -217,10 +220,11 @@ def ShowPlot(which=0):
         ax.get_xaxis().tick_bottom()
         ax.get_yaxis().tick_left()
 
-        plt.xlim(pd.Timestamp(year=2017, month=12, day=14), pd.Timestamp(year=2018, month=12, day=20))
-        plt.ylim(0, 880)
+        #plt.xlim(pd.Timestamp(year=2017, month=12, day=14), pd.Timestamp(year=2018, month=12, day=20))
+        plt.xlim(pd.Timestamp(year=2018, month=12, day=14), pd.Timestamp(year=2019, month=12, day=31))
+        #plt.ylim(0, 880)
 
-        plt.yticks(range(0, 880, 100), fontsize=10)
+        #plt.yticks(range(0, 880, 100), fontsize=10)
         months = mdates.MonthLocator()  # every month
         ax.xaxis.set_major_locator(months)
         yearsFmt = mdates.DateFormatter('%B')
@@ -238,17 +242,14 @@ def ShowPlot(which=0):
         ax.spines["right"].set_visible(False)
         ax.spines["left"].set_visible(False)
 
-        #ax.get_xaxis().tick_bottom()
-        #x.get_yaxis().tick_left()
+        plt.grid(True)
 
-        plt.xlim(0, 70)
-        plt.ylim(0, 880)
+        #plt.xlim(0, 70)
+        #plt.ylim(0, 880)
 
-        plt.yticks(range(0, 880, 100), fontsize=10)
-        plt.xticks(range(0, 71, 5), fontsize=10)
+        #plt.yticks(range(0, 880, 100), fontsize=10)
+        #plt.xticks(range(0, 71, 5), fontsize=10)
 
-        #plt.tick_params(axis="both", which="both", bottom="off", top="off",
-        #            labelbottom="on", left="off", right="off", labelleft="on")
         plt.show()
 
 def FirstDate(book):
@@ -256,19 +257,19 @@ def FirstDate(book):
     return book['dates'][0]
 
 
-all_data = AllBooks()
+all_data = AllBooks(startdir="logs\\2019\\")
 all_data.sort(key=FirstDate)
 
 print('Books Loaded and Processed')
 print('\n')
 CalculateStats(all_data)
-#ComparePlot(all_data)
-#AveragePlot(all_data)
+ComparePlot(all_data)
+AveragePlot(all_data)
 
 #print(all_data)
-'''
-AddEvents()
 
+
+AddEvents()
 for rank, item in enumerate(all_data):
     AddToPLot(item, rank)
     plt.grid(True)
@@ -276,4 +277,3 @@ for rank, item in enumerate(all_data):
     plt.xlabel(xlabel='Days')
     plt.ylabel(ylabel='Pages')
 ShowPlot()
-'''
