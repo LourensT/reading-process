@@ -75,7 +75,7 @@ class Plotter:
             print('\n')
             InSync = False
         else:
-            print('Processed ' + (filepath[int(filepath.rfind('\\')+1) : -5]))
+            #print('Processed ' + (filepath[int(filepath.rfind('\\')+1) : -5]))
             InSync = True
 
         if InSync:
@@ -98,7 +98,6 @@ class Plotter:
 
     def GetListOfFiles(self):
         fp = "logs\\" + str(self.year) + "\\" 
-        print(fp)
         filenames_relative = os.listdir(fp)
         filenames = []
         for item in filenames_relative:
@@ -106,13 +105,14 @@ class Plotter:
         return filenames
 
     def loadAll(self):
-        print('\n')
         if not self.data_loaded:
             self.all_logs = []
             filepaths = self.GetListOfFiles()
             for item in filepaths:
                 self.all_logs.append(self.loadOne(item))
             self.data_loaded = True
+        
+        self.CalculateStats()
     
     def calculateAverage(self):
         daysperbook = 0
@@ -124,12 +124,11 @@ class Plotter:
         for i in range(0, averagedays):
             dayprogress = 0
             amountofbooks = 0
-            #print(i)
             for item in self.all_logs:
                 if len(item['progress']) > (i+1):
                     dayprogress += int(item['progress'][i+1] - item['progress'][i])
                     amountofbooks += 1
-            print(i, amountofbooks, dayprogress)
+
             if i == 0:
                 averageprogress.append(0)
             else:
@@ -166,7 +165,6 @@ class Plotter:
         for book in self.all_logs:
             if book['InSync']:
                 plt.plot(book['index'],book['progress'], alpha=0.2, color='grey')
-                print('plotted: ' + book['title'])
             else:
                 print('skipped: ' + book['title'] + 'it\'s out of sync')
 
@@ -199,7 +197,6 @@ class Plotter:
                 if rank == 16:
                     y_pos = 700
                 plt.text(book['dates'][-1], y_pos, '('+ str(rank+1)+')', fontsize=12, color=self.tableau20[rank])
-                print('plotted: ' + book['title'])
             else:
                 print('skipped: ' + book['title'] + 'it\'s out of sync')
 
@@ -222,7 +219,6 @@ class Plotter:
         months = mdates.MonthLocator()  # every month
         ax.xaxis.set_major_locator(months)
         yearsFmt = mdates.DateFormatter('%B')
-        print(yearsFmt)
         ax.xaxis.set_major_formatter(yearsFmt)
 
         plt.tick_params(axis="both", which="both", bottom="off", top="off",
@@ -237,7 +233,6 @@ class Plotter:
         for book in self.all_logs:
             if book['InSync']:
                 plt.plot(book['index'],book['progress'], alpha=0.2, color='red')
-                print('plotted: ' + book['title'])
             else:
                 print('skipped: ' + book['title'] + 'it\'s out of sync')
         
@@ -251,7 +246,6 @@ class Plotter:
         for book in self.all_logs:
             if book['InSync']:
                 plt.plot(book['index'],book['progress'], alpha=0.1, color='blue')
-                print('plotted: ' + book['title'])
             else:
                 print('skipped: ' + book['title'] + 'it\'s out of sync')
         
@@ -275,6 +269,34 @@ class Plotter:
 
         plt.grid(True)
         plt.show()
+    
+    def TotalPages(self):
+        total = 0
+        for item in self.all_logs:
+            if isinstance(item['progress'][-1], int):
+                total += item['progress'][-1]
+
+        return total
+
+    def AverageBook(self):
+        total = 0
+        days = 0
+        for item in self.all_logs:
+            days += len(item['progress'])
+            if isinstance(item['progress'][-1], int):
+                total += item['progress'][-1]
+
+        avg_days = days / len(self.all_logs)
+        avg_pages = total / len(self.all_logs)
+
+        return round(avg_days, 2), round(avg_pages,2)
+
+    def CalculateStats(self):
+        print('Statistics for ' + str(self.year) + ':')
+        print(str(self.TotalPages()) + ' pages in total' )
+        print(str(self.AverageBook()[1]) + ' average pages per book' )
+        print(str(self.AverageBook()[0]) + ' average days per book' )
+        print('\n')
 
 
 class Application():
@@ -299,8 +321,8 @@ class Application():
         self.resultText = Label(self.window, text="default Year: 2019", bg=self.COLOR1, fg=self.COLOR2)
         self.resultText.grid(column=3,row=0)
 
-        self.resultText = Label(self.window, text="click a button for plot", bg=self.COLOR1, fg=self.COLOR2)
-        self.resultText.grid(column=1,row=3)
+        self.plotText = Label(self.window, text="click a button for plot", bg=self.COLOR1, fg=self.COLOR2)
+        self.plotText.grid(column=1,row=3)
         btnAllTrajectories = Button(self.window, text="all trajectories", command=self.plotter.plotTrajectories)
         btnAllTrajectories.grid(column=2, row=3)
         btnplotAverageTrajectories = Button(self.window, text="average trajectories", command=self.plotter.plotAverageTrajectories)
