@@ -232,11 +232,11 @@ class Plotter:
 
     def compareAverages(self):
         #2018
-        self.setYear2018()
+        self.setYear(2018)
         self.loadAll()
         for book in self.all_logs:
             if book['InSync']:
-                plt.plot(book['index'],book['progress'], alpha=0.1, color='red')
+                plt.plot(book['index'],book['progress'], alpha=0.2, color='red')
                 print('plotted: ' + book['title'])
             else:
                 print('skipped: ' + book['title'] + 'it\'s out of sync')
@@ -246,7 +246,7 @@ class Plotter:
         line1 = plt.plot(index2018,averageprogress2018, color='red')
 
         #2019        
-        self.setYear2019()
+        self.setYear(2019)
         self.loadAll()
         for book in self.all_logs:
             if book['InSync']:
@@ -278,31 +278,37 @@ class Plotter:
 
 
 class Application():
+    COLOR1 = 'black'
+    COLOR2 = 'white'
+
 
     def __init__(self) :
+        self.plotter = Plotter()
         self.window = Tk()
         self.window.title("Reading Process Progress")
-        self.plotter = Plotter()
+
+        self.window.configure(background=self.COLOR1)
+        self.window.grid_rowconfigure(1, minsize=20)
+        self.window.grid_rowconfigure(4, minsize=10)
+        self.window.grid_columnconfigure(2, minsize=100)
 
         self.entryBox = Entry(self.window)
         self.entryBox.grid(column=1, row=0)
         entryButton = Button(self.window, text="enter year to preview", command=self.entryButton)
         entryButton.grid(column=2, row=0)
-        self.resultText = Label(self.window, text="no year selected")
+        self.resultText = Label(self.window, text="default Year: 2019", bg=self.COLOR1, fg=self.COLOR2)
         self.resultText.grid(column=3,row=0)
 
-
-        btnAllTrajectories = Button(self.window, text="plot of all read trajectories", command=self.plotter.plotTrajectories)
-        btnAllTrajectories.grid(column=1, row=3)
-
+        self.resultText = Label(self.window, text="click a button for plot", bg=self.COLOR1, fg=self.COLOR2)
+        self.resultText.grid(column=1,row=3)
+        btnAllTrajectories = Button(self.window, text="all trajectories", command=self.plotter.plotTrajectories)
+        btnAllTrajectories.grid(column=2, row=3)
         btnplotAverageTrajectories = Button(self.window, text="average trajectories", command=self.plotter.plotAverageTrajectories)
-        btnplotAverageTrajectories.grid(column=2, row=3)
-
-        btnTimeline = Button(self.window, text="plot of timeline", command=self.plotter.plotTimeLine)
-        btnTimeline.grid(column=3, row=3)
-
-        btnCompareAverage = Button(self.window, text="compare average trajectories", command=self.plotter.compareAverages)
+        btnplotAverageTrajectories.grid(column=3, row=3)
+        btnCompareAverage = Button(self.window, text="average year by year", command=self.plotter.compareAverages)
         btnCompareAverage.grid(column=2, row=5)
+        btnTimeline = Button(self.window, text="timeline of reading", command=self.plotter.plotTimeLine)
+        btnTimeline.grid(column=3, row=5)
 
     def run(self):
         self.window.mainloop()
@@ -310,7 +316,7 @@ class Application():
     def entryButton(self):
         year = self.entryBox.get()
         valid = True
-        message = "Year selected succesfully"
+        message = "Year selected: " + year
 
         for char in year:
             if char not in "0123456789":
