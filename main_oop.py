@@ -48,6 +48,7 @@ class Plotter:
         #TODO make this a seperate class
         response = {}
 
+        print(filepath)
         book = pd.read_excel(filepath, sheet_name='Blad1', header=None)
         dates = book[book.columns[0]].tolist()
         progress = book[book.columns[1]].tolist()
@@ -109,7 +110,10 @@ class Plotter:
             self.all_logs = []
             filepaths = self.GetListOfFiles()
             for item in filepaths:
-                self.all_logs.append(self.loadOne(item))
+                if not "#" in item:
+                    self.all_logs.append(self.loadOne(item))
+                else:
+                    print("skipping discontinued books")
             self.data_loaded = True
         
         self.CalculateStats()
@@ -227,6 +231,8 @@ class Plotter:
         plt.show()
 
     def compareAverages(self):
+        #TODO Make this dynamic!!
+
         #2018
         self.setYear(2018)
         self.loadAll()
@@ -253,8 +259,21 @@ class Plotter:
         index2019 = np.arange(len(averageprogress2019))
         line2 = plt.plot(index2019,averageprogress2019, color='blue')
 
+        #2020        
+        self.setYear(2020)
+        self.loadAll()
+        for book in self.all_logs:
+            if book['InSync']:
+                plt.plot(book['index'],book['progress'], alpha=0.1, color='green')
+            else:
+                print('skipped: ' + book['title'] + 'it\'s out of sync')
+        
+        averageprogress2020 = self.calculateAverage()
+        index2020 = np.arange(len(averageprogress2020))
+        line3 = plt.plot(index2020,averageprogress2020, color='green')
+
         #plot final
-        plt.legend((line1, line2), ("2018", "2019"))
+        plt.legend((line1, line2, line3), ("2018", "2019", "2020"))
 
         plt.grid(False)
         plt.title(label='Average Book Progress')
