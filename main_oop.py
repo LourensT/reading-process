@@ -13,10 +13,11 @@ NEW CODE BASE
 class Plotter:
     tableau20 = []
     data_loaded = False
-    year = 2019
     all_logs = []
 
-    def __init__(self):
+    def __init__(self, pos_years):
+        self.year = pos_years[-1]
+        self.possible_years = pos_years
         self.tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),
              (44, 160, 44), (152, 223, 138), (214, 39, 40), (255, 152, 150),
              (148, 103, 189), (197, 176, 213), (140, 86, 75), (196, 156, 148),
@@ -114,6 +115,8 @@ class Plotter:
                     self.all_logs.append(self.loadOne(item))
                 else:
                     print("skipping discontinued books")
+
+            self.all_logs.sort(key=lambda x : x['finished'])
             self.data_loaded = True
         
         self.CalculateStats()
@@ -198,8 +201,6 @@ class Plotter:
                 plt.plot(book['dates'],book['progress'], lw=2, color=self.tableau20[rank])
                 y_pos = book['progress'][-1] -5
                 x_pos = book['dates'][-1]
-                if rank == 16:
-                    y_pos = 700
                 plt.text(book['dates'][-1], y_pos, '('+ str(rank+1)+')', fontsize=12, color=self.tableau20[rank])
             else:
                 print('skipped: ' + book['title'] + 'it\'s out of sync')
@@ -231,49 +232,22 @@ class Plotter:
         plt.show()
 
     def compareAverages(self):
-        #TODO Make this dynamic!!
-
-        #2018
-        self.setYear(2018)
-        self.loadAll()
-        for book in self.all_logs:
-            if book['InSync']:
-                plt.plot(book['index'],book['progress'], alpha=0.2, color='red')
-            else:
-                print('skipped: ' + book['title'] + 'it\'s out of sync')
+        for year in self.possible_years:
+            #2018
+            self.setYear(year)
+            self.loadAll()
+            for book in self.all_logs:
+                if book['InSync']:
+                    plt.plot(book['index'],book['progress'], alpha=0.2, color='black')
+                else:
+                    print('skipped: ' + book['title'] + 'it\'s out of sync')
         
-        averageprogress2018 = self.calculateAverage()
-        index2018 = np.arange(len(averageprogress2018))
-        line1 = plt.plot(index2018,averageprogress2018, color='red')
-
-        #2019        
-        self.setYear(2019)
-        self.loadAll()
-        for book in self.all_logs:
-            if book['InSync']:
-                plt.plot(book['index'],book['progress'], alpha=0.1, color='blue')
-            else:
-                print('skipped: ' + book['title'] + 'it\'s out of sync')
-        
-        averageprogress2019 = self.calculateAverage()
-        index2019 = np.arange(len(averageprogress2019))
-        line2 = plt.plot(index2019,averageprogress2019, color='blue')
-
-        #2020        
-        self.setYear(2020)
-        self.loadAll()
-        for book in self.all_logs:
-            if book['InSync']:
-                plt.plot(book['index'],book['progress'], alpha=0.1, color='green')
-            else:
-                print('skipped: ' + book['title'] + 'it\'s out of sync')
-        
-        averageprogress2020 = self.calculateAverage()
-        index2020 = np.arange(len(averageprogress2020))
-        line3 = plt.plot(index2020,averageprogress2020, color='green')
+            averageprogress = self.calculateAverage()
+            index= np.arange(len(averageprogress))
+            plt.plot(index,averageprogress, label=str(year))
 
         #plot final
-        plt.legend((line1, line2, line3), ("2018", "2019", "2020"))
+        plt.legend()
 
         plt.grid(False)
         plt.title(label='Average Book Progress')
@@ -324,7 +298,10 @@ class Application():
 
 
     def __init__(self) :
-        self.plotter = Plotter()
+
+        possible_years = [int(i) for i in os.listdir(os.getcwd() + "\\logs\\")]
+        self.plotter = Plotter(possible_years)
+
         self.window = Tk()
         self.window.title("Reading Process Progress")
 
@@ -333,12 +310,10 @@ class Application():
         self.window.grid_rowconfigure(4, minsize=10)
         self.window.grid_columnconfigure(2, minsize=100)
 
-        self.entryBox = Entry(self.window)
-        self.entryBox.grid(column=1, row=0)
-        entryButton = Button(self.window, text="enter year to preview", command=self.entryButton)
-        entryButton.grid(column=2, row=0)
-        self.resultText = Label(self.window, text="default Year: 2019", bg=self.COLOR1, fg=self.COLOR2)
-        self.resultText.grid(column=3,row=0)
+        self.selectedYear = StringVar(self.window)
+        self.selectedYear.set(possible_years[-1]) # default value
+        yearSelection = OptionMenu(self.window, self.selectedYear, *possible_years, command = self.yearEntered)
+        yearSelection.grid(column=2, row=0)
 
         self.plotText = Label(self.window, text="click a button for plot", bg=self.COLOR1, fg=self.COLOR2)
         self.plotText.grid(column=1,row=3)
@@ -354,28 +329,9 @@ class Application():
     def run(self):
         self.window.mainloop()
 
-    def entryButton(self):
-        year = self.entryBox.get()
-        valid = True
-        message = "Year selected: " + year
+    def yearEntered(self, val):
+        self.plotter.setYear(val)
 
-        for char in year:
-            if char not in "0123456789":
-                valid = False
-                message = "Please only enter numbers"
-        
-        if valid:
-            if len(year) == 4:
-                year = int(year)
-            else:
-                valid = False
-                message = "Please enter 4 numbers"
-        
-        if valid:
-            if not self.plotter.setYear(year):
-                message = "Year entered does not exist"
-            
-        self.resultText.config(text=message)
 
 
 if __name__ == "__main__":
