@@ -1,15 +1,10 @@
-from typing import Dict
 import pandas as pd
-from pandas import ExcelWriter
-from pandas import ExcelFile
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from tkinter import *
-'''
-NEW CODE BASE
-'''
+from Book import Book
+
 class Plotter:
     tableau20 = []
     data_loaded = False
@@ -45,60 +40,7 @@ class Plotter:
         else:
             return False
 
-    def loadOne(self, filepath):
-        #TODO make this a seperate class
-        response = {}
-
-        print(filepath)
-        book = pd.read_excel(filepath, sheet_name='Blad1', header=None)
-        dates = book[book.columns[0]].tolist()
-        progress = book[book.columns[1]].tolist()
-
-        first_date = dates[0] - pd.Timedelta('1 days')
-        first_progress = 0
-        dates = [first_date] + dates
-        progress = [first_progress] + progress
-
-        dates_interpolated = []
-        progress_interpolated = []
-        for i in range(len(dates)):
-            dates_interpolated.append(dates[i])
-            progress_interpolated.append(progress[i])
-            if (i != (len(dates)-1)):
-                iterator_date = dates[i] + pd.Timedelta('1 days')
-                while (dates[i+1] != iterator_date):
-                    dates_interpolated.append(iterator_date)
-                    progress_interpolated.append(progress[i])
-                    iterator_date = iterator_date + pd.Timedelta('1 days')
-
-        if (len(dates_interpolated) != len(progress_interpolated)):
-            print('Error: Progress and Dates out of Sync: ')
-            print(filepath[int(filepath.rfind('\\')+1) : -5])
-            print('\n')
-            InSync = False
-        else:
-            #print('Processed ' + (filepath[int(filepath.rfind('\\')+1) : -5]))
-            InSync = True
-
-        if InSync:
-            response['dates'] = dates_interpolated
-            response['progress'] = progress_interpolated
-            response['index'] = np.arange(len(progress_interpolated))
-            response['InSync'] = True
-        else:
-            response['dates'] = dates_interpolated
-            response['progress'] = progress_interpolated
-            response['index'] = np.arange(len(progress_interpolated))
-            response['InSync'] = False
-
-        title = filepath[int(filepath.rfind('\\')+1) : -5]
-        response['title'] = title
-        response['finished'] = dates[-1]
-        response['length'] = progress[-1]
-
-        return response
-
-    def GetListOfFiles(self):
+    def _get_list_of_logs(self):
         fp = "logs\\" + str(self.year) + "\\" 
         filenames_relative = os.listdir(fp)
         filenames = []
@@ -109,22 +51,30 @@ class Plotter:
     def loadAll(self):
         if not self.data_loaded:
             self.all_logs = []
-            filepaths = self.GetListOfFiles()
+            filepaths = self._get_list_of_logs()
             for item in filepaths:
                 if not "#" in item:
-                    self.all_logs.append(self.loadOne(item))
+                    self.all_logs.append(Book.from_filepath(item))
                 else:
-                    print("skipping discontinued books")
+                    print("Skipping discontinued book.")
 
-            self.all_logs.sort(key=lambda x : x['finished'])
+            # sort the books
+            self.all_logs.sort()
+
+            # print the index
+            print("=====================")
+            print("OVERVIEW OF BOOKS:")
+            for e,book in enumerate(self.all_logs):
+                print(f"* ({e+1}) {book.title}")
+            print("=====================")
             self.data_loaded = True
         
-        self.CalculateStats()
+            self.CalculateStats()
     
     def calculateAverage(self):
         daysperbook = 0
         for item in self.all_logs:
-            daysperbook += len(item['progress'])
+            daysperbook += len(item.progress)
         averagedays = int(daysperbook/len(self.all_logs))
 
         averageprogress = []
@@ -132,8 +82,8 @@ class Plotter:
             dayprogress = 0
             amountofbooks = 0
             for item in self.all_logs:
-                if len(item['progress']) > (i+1):
-                    dayprogress += int(item['progress'][i+1] - item['progress'][i])
+                if len(item.progress) > (i+1):
+                    dayprogress += int(item.progress[i+1] - item.progress[i])
                     amountofbooks += 1
 
             if i == 0:
@@ -147,10 +97,10 @@ class Plotter:
         self.loadAll() #make sure data is loaded
 
         for rank, book in enumerate(self.all_logs):
-            if book['InSync']:
-                plt.plot(book['index'],book['progress'], color=self.tableau20[rank])
+            if book.valid:
+                plt.plot(book.index,book.index, color=self.tableau20[rank])
             else:
-                print('skipped: ' + book['title'] + 'it\'s out of sync')
+                print('skipped: ' + book.title + 'it\'s out of sync')
             
         plt.grid(False)
         plt.title(label='Progress per book over time, compared')
@@ -170,10 +120,10 @@ class Plotter:
         self.loadAll()
 
         for book in self.all_logs:
-            if book['InSync']:
-                plt.plot(book['index'],book['progress'], alpha=0.2, color='grey')
+            if book.valid:
+                plt.plot(book.index,book.progress, alpha=0.2, color='grey')
             else:
-                print('skipped: ' + book['title'] + 'it\'s out of sync')
+                print('skipped: ' + book.title + 'it\'s out of sync')
 
         averageprogress = self.calculateAverage()
         index = np.arange(len(averageprogress))
@@ -197,13 +147,13 @@ class Plotter:
         self.loadAll() #make sure data is loaded
 
         for rank, book in enumerate(self.all_logs):
-            if book['InSync']:
-                plt.plot(book['dates'],book['progress'], lw=2, color=self.tableau20[rank])
-                y_pos = book['progress'][-1] -5
-                x_pos = book['dates'][-1]
-                plt.text(book['dates'][-1], y_pos, '('+ str(rank+1)+')', fontsize=12, color=self.tableau20[rank])
+            if book.valid:
+                plt.plot(book.dates, book.progress, lw=2, color=self.tableau20[rank])
+                y_pos = book.progress[-1] -5
+                x_pos = book.dates[-1]
+                plt.text(book.dates[-1], y_pos, '('+ str(rank+1)+')', fontsize=12, color=self.tableau20[rank])
             else:
-                print('skipped: ' + book['title'] + 'it\'s out of sync')
+                print('skipped: ' + book.title + 'it\'s out of sync')
 
         plt.grid(True)
         plt.title(label='Progress per book over time, compared')
@@ -237,10 +187,10 @@ class Plotter:
             self.setYear(year)
             self.loadAll()
             for book in self.all_logs:
-                if book['InSync']:
-                    plt.plot(book['index'],book['progress'], alpha=0.2, color='black')
+                if book.valid:
+                    plt.plot(book.index,book.progres, alpha=0.2, color='black')
                 else:
-                    print('skipped: ' + book['title'] + 'it\'s out of sync')
+                    print('skipped: ' + book.title + 'it\'s out of sync')
         
             averageprogress = self.calculateAverage()
             index= np.arange(len(averageprogress))
@@ -266,8 +216,8 @@ class Plotter:
     def TotalPages(self):
         total = 0
         for item in self.all_logs:
-            if isinstance(item['progress'][-1], int):
-                total += item['progress'][-1]
+            if isinstance(item.progress[-1], int):
+                total += item.progress[-1]
 
         return total
 
@@ -275,9 +225,9 @@ class Plotter:
         total = 0
         days = 0
         for item in self.all_logs:
-            days += len(item['progress'])
-            if isinstance(item['progress'][-1], int):
-                total += item['progress'][-1]
+            days += len(item.progress)
+            if isinstance(item.progress[-1], int):
+                total += item.progress[-1]
 
         avg_days = days / len(self.all_logs)
         avg_pages = total / len(self.all_logs)
@@ -290,50 +240,3 @@ class Plotter:
         print(str(self.AverageBook()[1]) + ' average pages per book' )
         print(str(self.AverageBook()[0]) + ' average days per book' )
         print('\n')
-
-
-class Application():
-    COLOR1 = 'black'
-    COLOR2 = 'white'
-
-
-    def __init__(self) :
-
-        possible_years = [int(i) for i in os.listdir(os.getcwd() + "\\logs\\")]
-        self.plotter = Plotter(possible_years)
-
-        self.window = Tk()
-        self.window.title("Reading Process Progress")
-
-        self.window.configure(background=self.COLOR1)
-        self.window.grid_rowconfigure(1, minsize=20)
-        self.window.grid_rowconfigure(4, minsize=10)
-        self.window.grid_columnconfigure(2, minsize=100)
-
-        self.selectedYear = StringVar(self.window)
-        self.selectedYear.set(possible_years[-1]) # default value
-        yearSelection = OptionMenu(self.window, self.selectedYear, *possible_years, command = self.yearEntered)
-        yearSelection.grid(column=2, row=0)
-
-        self.plotText = Label(self.window, text="click a button for plot", bg=self.COLOR1, fg=self.COLOR2)
-        self.plotText.grid(column=1,row=3)
-        btnAllTrajectories = Button(self.window, text="all trajectories", command=self.plotter.plotTrajectories)
-        btnAllTrajectories.grid(column=2, row=3)
-        btnplotAverageTrajectories = Button(self.window, text="average trajectories", command=self.plotter.plotAverageTrajectories)
-        btnplotAverageTrajectories.grid(column=3, row=3)
-        btnCompareAverage = Button(self.window, text="average year by year", command=self.plotter.compareAverages)
-        btnCompareAverage.grid(column=2, row=5)
-        btnTimeline = Button(self.window, text="timeline of reading", command=self.plotter.plotTimeLine)
-        btnTimeline.grid(column=3, row=5)
-
-    def run(self):
-        self.window.mainloop()
-
-    def yearEntered(self, val):
-        self.plotter.setYear(val)
-
-
-
-if __name__ == "__main__":
-    app = Application()
-    app.run()

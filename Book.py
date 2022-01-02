@@ -92,4 +92,5 @@ class Book:
                     name = name + ":"
             else:
                 name = name + char
-        name = name + raw_name[-1]
+        return name
+
