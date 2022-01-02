@@ -53,7 +53,7 @@ class Plotter:
             self.all_books = []
             filepaths = self._get_list_of_logs()
             for item in filepaths:
-                if not "#" in item:
+                if not '#DNF' in item:
                     self.all_books.append(Book.from_filepath(item))
                 else:
                     print("Skipping discontinued book.")
@@ -103,7 +103,7 @@ class Plotter:
                 print('skipped: ' + book.title + 'it\'s out of sync')
             
         plt.grid(False)
-        plt.title(label='Progress per book over time, compared')
+        plt.title(label=f'{self.year}: Progress per book over time, compared')
         plt.xlabel(xlabel='Days')
         plt.ylabel(ylabel='Pages')
 
@@ -127,7 +127,7 @@ class Plotter:
         plt.plot(index,averageprogress, color='black')
 
         plt.grid(False)
-        plt.title(label='Average Book Progress')
+        plt.title(label=f'{self.year}: Average Book Progress')
         plt.xlabel(xlabel='Days')
         plt.ylabel(ylabel='Pages')
 
@@ -150,7 +150,7 @@ class Plotter:
                 print('skipped: ' + book.title + 'it\'s out of sync')
 
         plt.grid(True)
-        plt.title(label='Progress per book over time, compared')
+        plt.title(label=f'{self.year}: Progress per book over time, compared')
         plt.xlabel(xlabel='Days')
         plt.ylabel(ylabel='Pages')
 
@@ -171,7 +171,6 @@ class Plotter:
 
     def compareAverages(self):
         for year in self.possible_years:
-            #2018
             self.setYear(year)
             self.loadAll()
             for book in self.all_books:
@@ -188,7 +187,7 @@ class Plotter:
         plt.legend()
 
         plt.grid(False)
-        plt.title(label='Average Book Progress')
+        plt.title(label='Average Book Progress for all years')
         plt.xlabel(xlabel='Days')
         plt.ylabel(ylabel='Pages')
 
