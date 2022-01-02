@@ -15,26 +15,31 @@ class Application():
         self.window = Tk()
         self.window.title("Reading Process Progress")
 
-        self.window.configure(background=self.COLOR1)
-        self.window.grid_rowconfigure(1, minsize=20)
+        self.window.configure(background=self.COLOR2)
+        # self.window.grid_rowconfigure(1, minsize=20)
         self.window.grid_rowconfigure(4, minsize=10)
         self.window.grid_columnconfigure(2, minsize=100)
+
+        self.label1 = Label(self.window, text="Aggregate:", bg=self.COLOR2, fg=self.COLOR1)
+        self.label1.grid(column=1, row=0)
+        btnCompareAverage = Button(self.window, text="average year by year", command=self.plotter.compareAverages)
+        btnCompareAverage.grid(column=2, row=1)
+
+        self.label2 = Label(self.window, text="Year specific:", bg=self.COLOR2, fg=self.COLOR1)
+        self.label2.grid(column=1,row=2)
 
         self.selectedYear = StringVar(self.window)
         self.selectedYear.set(possible_years[-1]) # default value
         yearSelection = OptionMenu(self.window, self.selectedYear, *possible_years, command = self.yearEntered)
-        yearSelection.grid(column=2, row=0)
-
-        self.plotText = Label(self.window, text="click a button for plot", bg=self.COLOR1, fg=self.COLOR2)
-        self.plotText.grid(column=1,row=3)
-        btnAllTrajectories = Button(self.window, text="all trajectories", command=self.plotter.plotTrajectories)
-        btnAllTrajectories.grid(column=2, row=3)
-        btnplotAverageTrajectories = Button(self.window, text="average trajectories", command=self.plotter.plotAverageTrajectories)
-        btnplotAverageTrajectories.grid(column=3, row=3)
-        btnCompareAverage = Button(self.window, text="average year by year", command=self.plotter.compareAverages)
-        btnCompareAverage.grid(column=2, row=5)
+        yearSelection.grid(column=1, row=3)
         btnTimeline = Button(self.window, text="timeline of reading", command=self.plotter.plotTimeLine)
-        btnTimeline.grid(column=3, row=5)
+        btnTimeline.grid(column=2, row=3)
+        btnAllTrajectories = Button(self.window, text="all trajectories", command=self.plotter.plotTrajectories)
+        btnAllTrajectories.grid(column=3, row=3)
+        btnplotAverageTrajectories = Button(self.window, text="average trajectories", command=self.plotter.plotAverageTrajectories)
+        btnplotAverageTrajectories.grid(column=4, row=3)
+
+
 
     def run(self):
         self.window.mainloop()

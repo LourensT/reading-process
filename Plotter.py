@@ -50,21 +50,21 @@ class Plotter:
 
     def loadAll(self):
         if not self.data_loaded:
-            self.all_logs = []
+            self.all_books = []
             filepaths = self._get_list_of_logs()
             for item in filepaths:
                 if not "#" in item:
-                    self.all_logs.append(Book.from_filepath(item))
+                    self.all_books.append(Book.from_filepath(item))
                 else:
                     print("Skipping discontinued book.")
 
             # sort the books
-            self.all_logs.sort()
+            self.all_books.sort()
 
             # print the index
             print("=====================")
             print("OVERVIEW OF BOOKS:")
-            for e,book in enumerate(self.all_logs):
+            for e,book in enumerate(self.all_books):
                 print(f"* ({e+1}) {book.title}")
             print("=====================")
             self.data_loaded = True
@@ -73,15 +73,15 @@ class Plotter:
     
     def calculateAverage(self):
         daysperbook = 0
-        for item in self.all_logs:
+        for item in self.all_books:
             daysperbook += len(item.progress)
-        averagedays = int(daysperbook/len(self.all_logs))
+        averagedays = int(daysperbook/len(self.all_books))
 
         averageprogress = []
         for i in range(0, averagedays):
             dayprogress = 0
             amountofbooks = 0
-            for item in self.all_logs:
+            for item in self.all_books:
                 if len(item.progress) > (i+1):
                     dayprogress += int(item.progress[i+1] - item.progress[i])
                     amountofbooks += 1
@@ -96,9 +96,9 @@ class Plotter:
     def plotTrajectories(self):
         self.loadAll() #make sure data is loaded
 
-        for rank, book in enumerate(self.all_logs):
+        for rank, book in enumerate(self.all_books):
             if book.valid:
-                plt.plot(book.index,book.index, color=self.tableau20[rank])
+                plt.plot(book.index, book.progress, color=self.tableau20[rank])
             else:
                 print('skipped: ' + book.title + 'it\'s out of sync')
             
@@ -108,10 +108,7 @@ class Plotter:
         plt.ylabel(ylabel='Pages')
 
         ax = plt.subplot(111)
-        ax.spines["top"].set_visible(False)
-        ax.spines["bottom"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_visible(False)
+        Plotter._disable_spines(ax)
 
         plt.grid(True)
         plt.show()
@@ -119,7 +116,7 @@ class Plotter:
     def plotAverageTrajectories(self):
         self.loadAll()
 
-        for book in self.all_logs:
+        for book in self.all_books:
             if book.valid:
                 plt.plot(book.index,book.progress, alpha=0.2, color='grey')
             else:
@@ -135,10 +132,7 @@ class Plotter:
         plt.ylabel(ylabel='Pages')
 
         ax = plt.subplot(111)
-        ax.spines["top"].set_visible(False)
-        ax.spines["bottom"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_visible(False)
+        Plotter._disable_spines(ax)
 
         plt.grid(True)
         plt.show()
@@ -146,7 +140,7 @@ class Plotter:
     def plotTimeLine(self):
         self.loadAll() #make sure data is loaded
 
-        for rank, book in enumerate(self.all_logs):
+        for rank, book in enumerate(self.all_books):
             if book.valid:
                 plt.plot(book.dates, book.progress, lw=2, color=self.tableau20[rank])
                 y_pos = book.progress[-1] -5
@@ -161,16 +155,10 @@ class Plotter:
         plt.ylabel(ylabel='Pages')
 
         ax = plt.subplot(111)
-        ax.spines["top"].set_visible(False)
-        ax.spines["bottom"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_visible(False)
+        Plotter._disable_spines(ax)
 
-        ax.get_xaxis().tick_bottom()
-        ax.get_yaxis().tick_left()
-
+        # set the months on the x-axis
         plt.xlim(pd.Timestamp(year=(self.year - 1), month=12, day=14), pd.Timestamp(year=self.year, month=12, day=31))
-
         months = mdates.MonthLocator()  # every month
         ax.xaxis.set_major_locator(months)
         yearsFmt = mdates.DateFormatter('%B')
@@ -186,9 +174,9 @@ class Plotter:
             #2018
             self.setYear(year)
             self.loadAll()
-            for book in self.all_logs:
+            for book in self.all_books:
                 if book.valid:
-                    plt.plot(book.index,book.progres, alpha=0.2, color='black')
+                    plt.plot(book.index,book.progress, alpha=0.2, color='black')
                 else:
                     print('skipped: ' + book.title + 'it\'s out of sync')
         
@@ -205,38 +193,41 @@ class Plotter:
         plt.ylabel(ylabel='Pages')
 
         ax = plt.subplot(111)
-        ax.spines["top"].set_visible(False)
-        ax.spines["bottom"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_visible(False)
+        Plotter._disable_spines(ax)
 
         plt.grid(True)
         plt.show()
     
     def TotalPages(self):
         total = 0
-        for item in self.all_logs:
+        for item in self.all_books:
             if isinstance(item.progress[-1], int):
                 total += item.progress[-1]
 
         return total
 
-    def AverageBook(self):
+    def stats_of_an_average_book(self):
         total = 0
         days = 0
-        for item in self.all_logs:
+        for item in self.all_books:
             days += len(item.progress)
             if isinstance(item.progress[-1], int):
                 total += item.progress[-1]
 
-        avg_days = days / len(self.all_logs)
-        avg_pages = total / len(self.all_logs)
+        avg_days = days / len(self.all_books)
+        avg_pages = total / len(self.all_books)
 
         return round(avg_days, 2), round(avg_pages,2)
+
+    def _disable_spines(ax):
+        ax.spines["top"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_visible(False)
 
     def CalculateStats(self):
         print('Statistics for ' + str(self.year) + ':')
         print(str(self.TotalPages()) + ' pages in total' )
-        print(str(self.AverageBook()[1]) + ' average pages per book' )
-        print(str(self.AverageBook()[0]) + ' average days per book' )
+        print(str(self.stats_of_an_average_book()[1]) + ' average pages per book' )
+        print(str(self.stats_of_an_average_book()[0]) + ' average days per book' )
         print('\n')
