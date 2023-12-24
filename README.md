@@ -14,4 +14,6 @@ Beginning 2018, I wanted to take reading a bit more serious, and to motivate mys
 
 * In 2020, I read 26 books, (8318 pages, 346.58 average pages per book, 18.29 average days per book).
 
-* In 2021, I read 37 books, (10067 pages, 270 average pages per book, 13.78 average days per book).
+* In 2021, I read 37 books, (10078 pages, 272.38 average pages per book, 13.59 average days per book).
+
+* In 2022, I read 35 books, (9572 pages, 273.49 average pages per book, 13.26 average days per book).

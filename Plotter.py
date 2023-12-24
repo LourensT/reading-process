@@ -30,7 +30,7 @@ class Plotter:
             self.tableau20[i] = (r / 255., g / 255., b / 255.)
     
     def setYear(self, new_year):
-        existing_years = os.listdir("logs\\")
+        existing_years = os.listdir(os.path.join(os.getcwd(), "logs"))
         existing_years = [int(s) for s in existing_years]
 
         if new_year in existing_years:
@@ -41,11 +41,13 @@ class Plotter:
             return False
 
     def _get_list_of_logs(self):
-        fp = "logs\\" + str(self.year) + "\\" 
+        fp = os.path.join(os.getcwd(), "logs", str(self.year))
         filenames_relative = os.listdir(fp)
         filenames = []
         for item in filenames_relative:
-            filenames.append(str(fp + item))
+            if ".xlsx" in item:
+                filenames.append(os.path.join(fp, item))
+
         return filenames
 
     def loadAll(self):

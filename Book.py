@@ -79,15 +79,18 @@ class Book:
         return Book(title, dates, progress)
         
     def _title_from_fp(fp):
-        raw_name = '.'.join(fp.split("\\")[-1].split(".")[:-1]) + '.'
+        raw_name = '.'.join(fp.split("/")[-1].split(".")[:-1]) + '.'
 
         # filter out the "_"
         name = ''
-        for i in range(len(raw_name)-1):
+        for i in range(1, len(raw_name)-1):
             char = raw_name[i]
             if char == "_":
                 if raw_name[i+1] == " ":
-                    name = name + ":"
+                    if raw_name[i-1] == " ":
+                        name = name + "&"
+                    else:
+                        name = name + ":"
                 else:
                     name = name + "'"
             else:
