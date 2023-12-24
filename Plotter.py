@@ -55,6 +55,7 @@ class Plotter:
             self.all_books = []
             filepaths = self._get_list_of_logs()
             for item in filepaths:
+                print("Loading: " + item)
                 if not '#DNF' in item:
                     self.all_books.append(Book.from_filepath(item))
                 else:

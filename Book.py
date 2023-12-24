@@ -82,7 +82,7 @@ class Book:
         raw_name = '.'.join(fp.split("/")[-1].split(".")[:-1]) + '.'
 
         # filter out the "_"
-        name = ''
+        name = raw_name[0]
         for i in range(1, len(raw_name)-1):
             char = raw_name[i]
             if char == "_":
