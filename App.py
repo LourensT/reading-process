@@ -9,7 +9,7 @@ class Application():
 
     def __init__(self) :
 
-        possible_years = [int(i) for i in os.listdir(os.getcwd() + "\\logs\\")]
+        possible_years = [int(i) for i in os.listdir(os.path.join(os.getcwd(), "logs"))]
         self.plotter = Plotter(possible_years)
 
         self.window = Tk()
