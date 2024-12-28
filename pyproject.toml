@@ -1,0 +1,12 @@
+[project]
+name = "reading-process"
+version = "0.1.0"
+description = "Visualizing my reading habits"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.0",
+    "numpy>=2.2.1",
+    "openpyxl>=3.1.5",
+    "pandas>=2.2.3",
+]
