@@ -29,48 +29,43 @@ def scale_last_value(filepath, target_value):
     df.to_excel(filepath, index=False, header=None, sheet_name="Blad1")
 
 
-year = "2023"
+year = "2024"
 fp = "./logs/" + year
 paths = sorted(Path(fp).iterdir(), key=os.path.getmtime)
+
+# actual book lengths in pages
 pages = [
-    310,
-    317,
-    229,
-    271,
-    95,
-    388,
-    157,
-    487,
-    96,
-    212,
-    285,
-    319,
-    264,
-    496,
-    383,
-    272,
-    393,
-    313,
+    90,
+    148,
+    213,
+    148,
+    175,
+    288,
+    855,
+    256,
+    248,
+    207,
+    341,
     314,
-    208,
-    200,
-    366,
-    578,
-    380,
-    134,
-    299,
-    688,
-    440,
-    131,
-    251,
-    188,
-    226,
+    224,
+    311,
+    304,
+    289,
+    1625,
+    176,
+    279,
+    116,
+    382,
     234,
-    253,
+    314,
+    164,
+    376,
+    140,
+    207
 ]
 
-for item, l in zip(paths, pages):
-    scale_last_value(item, l)
+for item, length in zip(paths, pages):
+    scale_last_value(item, length)
 
 # Example usage:
 # Replace 'your_file.xlsx' with the actual file path and provide the desired target value
