@@ -1,3 +1,4 @@
+# %%
 import pandas as pd
 import os
 from pathlib import Path
@@ -30,28 +31,29 @@ def scale_last_value(filepath, target_value):
 
 
 year = "2024"
-fp = "./logs/" + year
+fp = "../logs/" + year
 paths = sorted(Path(fp).iterdir(), key=os.path.getmtime)
+
+# Filter out non-Excel files
+paths = [p for p in paths if p.suffix == ".xlsx"]
+for p in paths:
+    print(p)
 
 # actual book lengths in pages
 pages = [
     90,
     148,
     213,
-    148,
     175,
     288,
     855,
     256,
     248,
-    207,
     341,
     314,
-    224,
     311,
     304,
     289,
-    1625,
     176,
     279,
     116,
@@ -61,9 +63,16 @@ pages = [
     164,
     376,
     140,
-    207
+    207,
+    207,
+    148, 
+    224,
+    1625
 ]
 
+assert len(paths) == len(pages), [len(paths), len(pages)]
+
+# %%
 for item, length in zip(paths, pages):
     scale_last_value(item, length)
 

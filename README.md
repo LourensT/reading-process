@@ -1,14 +1,14 @@
-# Visualizing my progress in individual books
+# Visualizing book reading progress
 
-Data Source: I log progress manually in my notes app and then I put it on google sheets 
+Data Source: I log progress manually in my notes app and then I put it on google sheets. It's a bit of a holiday tradition for me to process this data at the end of the year.
 
-Visualization Tool: Python 3.6 with matplotlib
+Visualization: Python 3.12 with matplotlib
 
 Beginning 2018, I wanted to take reading a bit more serious, and to motivate myself, I'd log my progress (don't ask me why, but it worked). At the end of 2018 I then wrote some code to make some visualizations out of it. I continued reading and logging my progress, so at the end of 2019 I reworked some of the code with the goal of making this tool a bit more dynamic for years to come.
 
 # Reading per year
 
-* In 2018 I read 25 books, (7645 pages, 305 page average per book, 14 days average per book). I added some events in my personal life in the timeline to give context for my reading habits. I posted this on /r/dataisbeautiful as well https://www.reddit.com/r/dataisbeautiful/comments/ad9vut/oc_is_it_too_late_to_post_2018_recaps_well_either/
+* In 2018 I read 25 books, (7645 pages, 305 page average per book, 14 days average per book). 
 
 * In 2019 I read 36 books, (12145 pages, 328.24 page average per book, 11.76 days average per book).
 
@@ -18,17 +18,28 @@ Beginning 2018, I wanted to take reading a bit more serious, and to motivate mys
 
 * In 2022, I read 35 books, (9572 pages, 273.49 average pages per book, 13.26 average days per book).
 
+* In 2023, I read 37 books, (10017 pages, 270.73 average pages per book, 15.41 average days per book).
+
+* In 2024, I read 27 books, (8422 pages, 311.93 average pages per book, 31.93 average days per book).
+
 # Install 
 Using `uv` as package manager:
 ```bash
 uv venv # create virtual environment
-uv sync # install dependencies
+source .venv/bin/activate # activate virtual environment
+uv pip install -e .
 ```
+# Usage
 
-Tthen, make sure tcl8.6 and tk8.6 are present in the virtual environment. If not, move them from
-`~/.local/share/uv/python/cpython-3.12.7-macos-aarch64-none/lib/~`
-
-Then to run
 ```bash
-uv run App.py
+uv run -m readingprocess input/dir output/dir --period_name 2024
+```
+where `--period_name` is an optional argument to name the period in `input/dir`.
+
+# Not using uv
+```bash
+python -m virtualenv env
+source env/bin/activate
+pip install -e .
+python -m readingprocess input/dir output/dir --period_name 2024
 ```

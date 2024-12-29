@@ -1,19 +1,15 @@
+from .book import Book
+
 import pandas as pd
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from Book import Book
-
+from typing import List
 
 class Plotter:
-    tableau20 = []
-    data_loaded = False
-    all_logs = []
-
-    def __init__(self, pos_years):
-        self.year = pos_years[-1]
-        self.possible_years = pos_years
+    def __init__(self, directory: str, period: str) -> None:
+        self.period = period
         self.tableau20 = [
             (31, 119, 180),
             (174, 199, 232),
@@ -62,24 +58,10 @@ class Plotter:
             r, g, b = self.tableau20[i]
             self.tableau20[i] = (r / 255.0, g / 255.0, b / 255.0)
 
-    def setYear(self, new_year):
-        existing_years_raw = os.listdir(os.path.join(os.getcwd(), "logs"))
-        existing_years = []
-        for item in existing_years_raw:
-            try:
-                existing_years.append(int(item))
-            except ValueError:
-                pass
+        self.data_loaded = False
+        self._load_all_logs(directory)
 
-        if new_year in existing_years:
-            self.year = new_year
-            self.data_loaded = False
-            return True
-        else:
-            return False
-
-    def _get_list_of_logs(self):
-        fp = os.path.join(os.getcwd(), "logs", str(self.year))
+    def _get_list_of_logs(self, fp: str) -> List[str]:
         filenames_relative = os.listdir(fp)
         filenames = []
         for item in filenames_relative:
@@ -88,13 +70,15 @@ class Plotter:
 
         return filenames
 
-    def loadAll(self):
+    def _load_all_logs(self, fp: str) -> None:
         if not self.data_loaded:
             self.all_books = []
-            filepaths = self._get_list_of_logs()
+
+            filepaths = self._get_list_of_logs(fp)
+
             for item in filepaths:
                 print("Loading: " + item)
-                if not "#DNF" in item:
+                if "#DNF" not in item:
                     self.all_books.append(Book.from_filepath(item))
                 else:
                     print("Skipping discontinued book.")
@@ -110,9 +94,125 @@ class Plotter:
             print("=====================")
             self.data_loaded = True
 
-            self.CalculateStats()
+            self._calculate_stats()
 
-    def calculateAverage(self):
+
+    def plot_trajectories(self) -> plt.Figure:
+        """
+        The progress of each book is plotted over a shared "time since start" axis.
+        """
+        if not self.data_loaded:
+            raise Exception("Data not loaded, call loadAll() first")
+
+        fig = plt.figure(figsize=(15, 7), dpi=200)
+        ax = fig.add_subplot(111)
+
+        for rank, book in enumerate(self.all_books):
+            if book.valid:
+                ax.plot(book.index, book.progress, color=self.tableau20[rank])
+            else:
+                print("skipped: " + book.title + "it's out of sync")
+
+        ax.set_title(label=f"{self.period}: Progress per book over time, compared")
+        ax.set_xlabel(xlabel="Days")
+        ax.set_ylabel(ylabel="Pages")
+
+        ax.grid(True)
+        Plotter._disable_spines(ax)
+
+        return fig
+
+    def plot_average_trajectories(self) -> plt.Figure:
+        """
+        Plot the average progress path of all books in the period
+        """
+        if not self.data_loaded:
+            raise Exception("Data not loaded, call loadAll() first")
+
+        fig = plt.figure(figsize=(15, 7), dpi=200)
+        ax = fig.add_subplot(111)
+
+        for book in self.all_books:
+            if book.valid:
+                ax.plot(book.index, book.progress, alpha=0.2, color="grey")
+            else:
+                print("skipped: " + book.title + "it's out of sync")
+
+        averageprogress = self._calculate_average_progress()
+        index = np.arange(len(averageprogress))
+        plt.plot(index, averageprogress, color="black")
+
+        ax.set_title(label=f"{self.period}: Average Book Progress")
+        ax.set_xlabel(xlabel="Days")
+        ax.set_ylabel(ylabel="Pages")
+
+        Plotter._disable_spines(ax)
+        ax.grid(True)
+
+        return fig
+
+    def plot_timeline(self) -> plt.Figure:
+        """
+        Displays the individual progress of each book with the period of time as the x-axis.
+        """
+        if not self.data_loaded:
+            raise Exception("Data not loaded, call loadAll() first")
+
+        fig = plt.figure(figsize=(15, 7), dpi=200)
+        ax = fig.add_subplot(111)
+
+        for rank, book in enumerate(self.all_books):
+            if book.valid:
+                ax.plot(book.dates, book.progress, lw=2, color=self.tableau20[rank])
+                y_pos = book.progress[-1] - 5
+                x_pos = book.dates[-1]
+
+                ax.text(
+                    x_pos,
+                    y_pos,
+                    "(" + str(rank + 1) + ")",
+                    fontsize=12,
+                    color=self.tableau20[rank],
+                )
+            else:
+                print("skipped: " + book.title + "it's out of sync")
+
+        ax.grid(True)
+        ax.set_title(f"{self.period}: Progress per book over time, compared")
+        ax.set_xlabel("Days")
+        ax.set_ylabel("Pages")
+
+        Plotter._disable_spines(ax)
+
+        first_day = self.all_books[0].date_started - pd.Timedelta("1 days")
+        last_day = self.all_books[-1].date_finished + pd.Timedelta("1 days")
+
+        # set the months on the x-axis
+        ax.set_xlim(first_day, last_day)
+
+        months = mdates.MonthLocator()  # every month
+        ax.xaxis.set_major_locator(months)
+
+        yearsFmt = mdates.DateFormatter("%B")  # every year
+        ax.xaxis.set_major_formatter(yearsFmt)
+
+        ax.tick_params(
+            axis="both",
+            which="both",
+            bottom="off",
+            top="off",
+            labelbottom="on",
+            left="off",
+            right="off",
+            labelleft="on",
+        )
+
+        return fig
+
+    def _calculate_average_progress(self) -> List[int]:
+        """
+        calculate the average progress path of all books in the period
+        """
         daysperbook = 0
         for item in self.all_books:
             daysperbook += len(item.progress)
@@ -136,128 +236,10 @@ class Plotter:
 
         return averageprogress
 
-    def plotTrajectories(self):
-        self.loadAll()  # make sure data is loaded
-
-        for rank, book in enumerate(self.all_books):
-            if book.valid:
-                plt.plot(book.index, book.progress, color=self.tableau20[rank])
-            else:
-                print("skipped: " + book.title + "it's out of sync")
-
-        plt.grid(False)
-        plt.title(label=f"{self.year}: Progress per book over time, compared")
-        plt.xlabel(xlabel="Days")
-        plt.ylabel(ylabel="Pages")
-
-        ax = plt.subplot(111)
-        Plotter._disable_spines(ax)
-
-        plt.grid(True)
-        plt.show()
-
-    def plotAverageTrajectories(self):
-        self.loadAll()
-
-        for book in self.all_books:
-            if book.valid:
-                plt.plot(book.index, book.progress, alpha=0.2, color="grey")
-            else:
-                print("skipped: " + book.title + "it's out of sync")
-
-        averageprogress = self.calculateAverage()
-        index = np.arange(len(averageprogress))
-        plt.plot(index, averageprogress, color="black")
-
-        plt.grid(False)
-        plt.title(label=f"{self.year}: Average Book Progress")
-        plt.xlabel(xlabel="Days")
-        plt.ylabel(ylabel="Pages")
-
-        ax = plt.subplot(111)
-        Plotter._disable_spines(ax)
-
-        plt.grid(True)
-        plt.show()
-
-    def plotTimeLine(self):
-        self.loadAll()  # make sure data is loaded
-
-        for rank, book in enumerate(self.all_books):
-            if book.valid:
-                plt.plot(book.dates, book.progress, lw=2, color=self.tableau20[rank])
-                y_pos = book.progress[-1] - 5
-                x_pos = book.dates[-1]
-                plt.text(
-                    book.dates[-1],
-                    y_pos,
-                    "(" + str(rank + 1) + ")",
-                    fontsize=12,
-                    color=self.tableau20[rank],
-                )
-            else:
-                print("skipped: " + book.title + "it's out of sync")
-
-        plt.grid(True)
-        plt.title(label=f"{self.year}: Progress per book over time, compared")
-        plt.xlabel(xlabel="Days")
-        plt.ylabel(ylabel="Pages")
-
-        ax = plt.subplot(111)
-        Plotter._disable_spines(ax)
-
-        # set the months on the x-axis
-        plt.xlim(
-            pd.Timestamp(year=(self.year - 1), month=12, day=14),
-            pd.Timestamp(year=self.year, month=12, day=31),
-        )
-        months = mdates.MonthLocator()  # every month
-        ax.xaxis.set_major_locator(months)
-        yearsFmt = mdates.DateFormatter("%B")
-        ax.xaxis.set_major_formatter(yearsFmt)
-
-        plt.tick_params(
-            axis="both",
-            which="both",
-            bottom="off",
-            top="off",
-            labelbottom="on",
-            left="off",
-            right="off",
-            labelleft="on",
-        )
-
-        plt.show()
-
-    def compareAverages(self):
-        for year in self.possible_years:
-            self.setYear(year)
-            self.loadAll()
-            for book in self.all_books:
-                if book.valid:
-                    plt.plot(book.index, book.progress, alpha=0.2, color="black")
-                else:
-                    print("skipped: " + book.title + "it's out of sync")
-
-            averageprogress = self.calculateAverage()
-            index = np.arange(len(averageprogress))
-            plt.plot(index, averageprogress, label=str(year))
-
-        # plot final
-        plt.legend()
-
-        plt.grid(False)
-        plt.title(label="Average Book Progress for all years")
-        plt.xlabel(xlabel="Days")
-        plt.ylabel(ylabel="Pages")
-
-        ax = plt.subplot(111)
-        Plotter._disable_spines(ax)
-
-        plt.grid(True)
-        plt.show()
-
-    def TotalPages(self):
+    def _total_pages(self) -> int:
+        """
+        Returns the total number of pages read in the period
+        """
         total = 0
         for item in self.all_books:
             if isinstance(item.progress[-1], int):
@@ -265,7 +247,10 @@ class Plotter:
 
         return total
 
-    def stats_of_an_average_book(self):
+    def _stats_of_an_average_book(self) -> (float, float):
+        """
+        Returns the average days and pages of a book in the period
+        """
         total = 0
         days = 0
         for item in self.all_books:
@@ -284,9 +269,12 @@ class Plotter:
         ax.spines["right"].set_visible(False)
         ax.spines["left"].set_visible(False)
 
-    def CalculateStats(self):
-        print("Statistics for " + str(self.year) + ":")
-        print(str(self.TotalPages()) + " pages in total")
-        print(str(self.stats_of_an_average_book()[1]) + " average pages per book")
-        print(str(self.stats_of_an_average_book()[0]) + " average days per book")
+    def _calculate_stats(self):
+        """
+        Print statistics of the period
+        """
+        print("Statistics:")
+        print(str(self._total_pages()) + " pages in total")
+        print(str(self._stats_of_an_average_book()[1]) + " average pages per book")
+        print(str(self._stats_of_an_average_book()[0]) + " average days per book")
         print("\n")
