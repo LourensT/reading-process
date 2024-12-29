@@ -2,7 +2,7 @@
 
 Data Source: I log progress manually in my notes app and then I put it on google sheets 
 
-Visualization Tool: Python 3.6 with matplotlib
+Visualization Tool: Python 3.12 with matplotlib
 
 Beginning 2018, I wanted to take reading a bit more serious, and to motivate myself, I'd log my progress (don't ask me why, but it worked). At the end of 2018 I then wrote some code to make some visualizations out of it. I continued reading and logging my progress, so at the end of 2019 I reworked some of the code with the goal of making this tool a bit more dynamic for years to come.
 
@@ -22,7 +22,8 @@ Beginning 2018, I wanted to take reading a bit more serious, and to motivate mys
 Using `uv` as package manager:
 ```bash
 uv venv # create virtual environment
-uv sync # install dependencies
+source .venv/bin/activate # activate virtual environment
+uv pip install  -e .
 ```
 
 Tthen, make sure tcl8.6 and tk8.6 are present in the virtual environment. If not, move them from
@@ -30,5 +31,5 @@ Tthen, make sure tcl8.6 and tk8.6 are present in the virtual environment. If not
 
 Then to run
 ```bash
-uv run App.py
+uv run -m readingprocess [args]
 ```

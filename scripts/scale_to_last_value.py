@@ -34,10 +34,11 @@ year = "2024"
 fp = "../logs/" + year
 paths = sorted(Path(fp).iterdir(), key=os.path.getmtime)
 
+# Filter out non-Excel files
+paths = [p for p in paths if p.suffix == ".xlsx"]
 for p in paths:
     print(p)
 
-# %%
 # actual book lengths in pages
 pages = [
     90,
@@ -53,7 +54,6 @@ pages = [
     311,
     304,
     289,
-    1625,
     176,
     279,
     116,
@@ -67,10 +67,12 @@ pages = [
     207,
     148, 
     224,
+    1625
 ]
 
-# assert len(paths) == len(pages), [len(paths), len(pages)]
+assert len(paths) == len(pages), [len(paths), len(pages)]
 
+# %%
 for item, length in zip(paths, pages):
     scale_last_value(item, length)
 

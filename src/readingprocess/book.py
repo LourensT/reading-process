@@ -2,10 +2,10 @@ from datetime import datetime
 import functools
 import pandas as pd
 import numpy as np
-from typing import List, Dict
+from typing import List
 
 """
-abstract data type for the log of a single book
+data type for the log of a single book
 """
 
 
