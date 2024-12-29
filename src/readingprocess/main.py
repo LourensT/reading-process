@@ -16,9 +16,9 @@ def main():
     parser.add_argument("output_dir", type=str, help="Path to the output directory.")
 
     parser.add_argument(
-        "--aggregate",
+        "--grouped",
         action="store_true",
-        help="Enable aggregation of data during processing.",
+        help="Figures comparing logs in subdirectories of input_dir",
     )
 
     parser.add_argument(
@@ -43,8 +43,8 @@ def main():
     if args.period_name is None:
         args.period_name = os.path.basename(args.input_dir)
 
-    if args.aggregate:
-        print("creating aggregated figure")
+    if args.grouped:
+        print("creating grouped-by figure")
         raise NotImplementedError
     else:
         # load data

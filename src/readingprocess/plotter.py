@@ -5,10 +5,10 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-
+from typing import List
 
 class Plotter:
-    def __init__(self, directory: str, period: str):
+    def __init__(self, directory: str, period: str) -> None:
         self.period = period
         self.tableau20 = [
             (31, 119, 180),
@@ -61,7 +61,7 @@ class Plotter:
         self.data_loaded = False
         self._load_all_logs(directory)
 
-    def _get_list_of_logs(self, fp):
+    def _get_list_of_logs(self, fp: str) -> List[str]:
         filenames_relative = os.listdir(fp)
         filenames = []
         for item in filenames_relative:
@@ -70,7 +70,7 @@ class Plotter:
 
         return filenames
 
-    def _load_all_logs(self, fp):
+    def _load_all_logs(self, fp: str) -> None:
         if not self.data_loaded:
             self.all_books = []
 
@@ -97,7 +97,10 @@ class Plotter:
             self._calculate_stats()
 
 
-    def plot_trajectories(self):
+    def plot_trajectories(self) -> plt.Figure:
+        """
+        The progress of each book is plotted over a shared "time since start" axis.
+        """
         if not self.data_loaded:
             raise Exception("Data not loaded, call loadAll() first")
 
@@ -119,7 +122,10 @@ class Plotter:
 
         return fig
 
-    def plot_average_trajectories(self):
+    def plot_average_trajectories(self) -> plt.Figure:
+        """
+        Plot the average progress path of all books in the period
+        """
         if not self.data_loaded:
             raise Exception("Data not loaded, call loadAll() first")
 
@@ -132,7 +138,7 @@ class Plotter:
             else:
                 print("skipped: " + book.title + "it's out of sync")
 
-        averageprogress = self._calculate_average()
+        averageprogress = self._calculate_average_progress()
         index = np.arange(len(averageprogress))
         plt.plot(index, averageprogress, color="black")
 
@@ -145,7 +151,10 @@ class Plotter:
 
         return fig
 
-    def plot_timeline(self):
+    def plot_timeline(self) -> plt.Figure:
+        """
+        Displays the individual progress of each book with the period of time as the x-axis.
+        """
         if not self.data_loaded:
             raise Exception("Data not loaded, call loadAll() first")
 
@@ -200,7 +209,10 @@ class Plotter:
 
         return fig
 
-    def _calculate_average(self):
+    def _calculate_average_progress(self) -> List[int]:
+        """
+        calculate the average progress path of all books in the period
+        """
         daysperbook = 0
         for item in self.all_books:
             daysperbook += len(item.progress)
@@ -224,7 +236,10 @@ class Plotter:
 
         return averageprogress
 
-    def _total_pages(self):
+    def _total_pages(self) -> int:
+        """
+        Returns the total number of pages read in the period
+        """
         total = 0
         for item in self.all_books:
             if isinstance(item.progress[-1], int):
@@ -232,7 +247,10 @@ class Plotter:
 
         return total
 
-    def _stats_of_an_average_book(self):
+    def _stats_of_an_average_book(self) -> (float, float):
+        """
+        Returns the average days and pages of a book in the period
+        """
         total = 0
         days = 0
         for item in self.all_books:
@@ -252,6 +270,9 @@ class Plotter:
         ax.spines["left"].set_visible(False)
 
     def _calculate_stats(self):
+        """
+        Print statistics of the period
+        """
         print("Statistics:")
         print(str(self._total_pages()) + " pages in total")
         print(str(self._stats_of_an_average_book()[1]) + " average pages per book")
