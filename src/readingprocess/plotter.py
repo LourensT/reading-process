@@ -1,63 +1,16 @@
 from .book import Book
+from .constants import TABLEAU20    
 
 import pandas as pd
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from typing import List
+from typing import List, Tuple
 
 class Plotter:
     def __init__(self, directory: str, period: str) -> None:
         self.period = period
-        self.tableau20 = [
-            (31, 119, 180),
-            (174, 199, 232),
-            (255, 127, 14),
-            (255, 187, 120),
-            (44, 160, 44),
-            (152, 223, 138),
-            (214, 39, 40),
-            (255, 152, 150),
-            (148, 103, 189),
-            (197, 176, 213),
-            (140, 86, 75),
-            (196, 156, 148),
-            (227, 119, 194),
-            (247, 182, 210),
-            (127, 127, 127),
-            (199, 199, 199),
-            (188, 189, 34),
-            (219, 219, 141),
-            (23, 190, 207),
-            (158, 218, 229),
-            (31, 119, 180),
-            (174, 199, 232),
-            (255, 127, 14),
-            (255, 187, 120),
-            (44, 160, 44),
-            (152, 223, 138),
-            (214, 39, 40),
-            (255, 152, 150),
-            (148, 103, 189),
-            (197, 176, 213),
-            (140, 86, 75),
-            (196, 156, 148),
-            (227, 119, 194),
-            (247, 182, 210),
-            (127, 127, 127),
-            (199, 199, 199),
-            (188, 189, 34),
-            (219, 219, 141),
-            (23, 190, 207),
-            (158, 218, 229),
-        ]
-
-        # Scale the RGB values to the [0, 1] range, which is the format matplotlib accepts.
-        for i in range(len(self.tableau20)):
-            r, g, b = self.tableau20[i]
-            self.tableau20[i] = (r / 255.0, g / 255.0, b / 255.0)
-
         self.data_loaded = False
         self._load_all_logs(directory)
 
@@ -109,7 +62,7 @@ class Plotter:
 
         for rank, book in enumerate(self.all_books):
             if book.valid:
-                ax.plot(book.index, book.progress, color=self.tableau20[rank])
+                ax.plot(book.index, book.progress, color=TABLEAU20[rank])
             else:
                 print("skipped: " + book.title + "it's out of sync")
 
@@ -163,7 +116,7 @@ class Plotter:
 
         for rank, book in enumerate(self.all_books):
             if book.valid:
-                ax.plot(book.dates, book.progress, lw=2, color=self.tableau20[rank])
+                ax.plot(book.dates, book.progress, lw=2, color=TABLEAU20[rank])
                 y_pos = book.progress[-1] - 5
                 x_pos = book.dates[-1]
 
@@ -172,7 +125,7 @@ class Plotter:
                     y_pos,
                     "(" + str(rank + 1) + ")",
                     fontsize=12,
-                    color=self.tableau20[rank],
+                    color=TABLEAU20[rank],
                 )
             else:
                 print("skipped: " + book.title + "it's out of sync")
@@ -247,7 +200,7 @@ class Plotter:
 
         return total
 
-    def _stats_of_an_average_book(self) -> (float, float):
+    def _stats_of_an_average_book(self) -> Tuple[float, float]:
         """
         Returns the average days and pages of a book in the period
         """
