@@ -45,7 +45,10 @@ def main():
 
     if args.grouped:
         print("creating grouped-by figure")
-        raise NotImplementedError
+        plotter = Plotter(args.input_dir, None, grouped=True)
+        grouped_figure = plotter.grouped_plot()
+        save_plot(grouped_figure, args.output_dir, "grouped.png")
+    
     else:
         # load data
         plotter = Plotter(args.input_dir, args.period_name)

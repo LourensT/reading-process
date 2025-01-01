@@ -31,10 +31,16 @@ uv pip install -e .
 ```
 # Usage
 
+For a given period, plots can be generated using the following command:
 ```bash
 uv run -m readingprocess input/dir output/dir --period_name 2024
 ```
 where `--period_name` is an optional argument to name the period in `input/dir`.
+
+If there is a directory with subdirectories corresponding to different periods, the following command can be used to generate plots comparing the periods.
+```bash
+uv run -m readingprocess input/dir output/dir --grouped
+```
 
 # Not using uv
 ```bash
@@ -42,4 +48,5 @@ python -m virtualenv env
 source env/bin/activate
 pip install -e .
 python -m readingprocess input/dir output/dir --period_name 2024
+python -m readingprocess input/dir output/dir --grouped
 ```

@@ -9,10 +9,17 @@ import matplotlib.dates as mdates
 from typing import List, Tuple
 
 class Plotter:
-    def __init__(self, directory: str, period: str) -> None:
-        self.period = period
-        self.data_loaded = False
-        self._load_all_logs(directory)
+    def __init__(self, directory: str, period: str, grouped: bool = False) -> None:
+        if not os.path.isdir(directory):
+            raise Exception("Directory not found")
+    
+        if grouped:
+            self.data_loaded = False
+            self.main_directory = directory
+        else:   
+            self.period = period
+            self.data_loaded = False
+            self._load_all_logs(directory)
 
     def _get_list_of_logs(self, fp: str) -> List[str]:
         filenames_relative = os.listdir(fp)
@@ -24,31 +31,29 @@ class Plotter:
         return filenames
 
     def _load_all_logs(self, fp: str) -> None:
-        if not self.data_loaded:
-            self.all_books = []
+        self.all_books = []
 
-            filepaths = self._get_list_of_logs(fp)
+        filepaths = self._get_list_of_logs(fp)
 
-            for item in filepaths:
-                print("Loading: " + item)
-                if "#DNF" not in item:
-                    self.all_books.append(Book.from_filepath(item))
-                else:
-                    print("Skipping discontinued book.")
+        for item in filepaths:
+            print("Loading: " + item)
+            if "#DNF" not in item:
+                self.all_books.append(Book.from_filepath(item))
+            else:
+                print("Skipping discontinued book.")
 
-            # sort the books
-            self.all_books.sort()
+        # sort the books
+        self.all_books.sort()
 
-            # print the index
-            print("=====================")
-            print("OVERVIEW OF BOOKS:")
-            for e, book in enumerate(self.all_books):
-                print(f"* ({e+1}) {book.title}")
-            print("=====================")
-            self.data_loaded = True
+        # print the index
+        print("=====================")
+        print("OVERVIEW OF BOOKS:")
+        for e, book in enumerate(self.all_books):
+            print(f"* ({e+1}) {book.title}")
+        print("=====================")
+        self.data_loaded = True
 
-            self._calculate_stats()
-
+        self._calculate_stats()
 
     def plot_trajectories(self) -> plt.Figure:
         """
@@ -161,6 +166,54 @@ class Plotter:
         )
 
         return fig
+
+    def grouped_plot(self) -> plt.Figure:
+        """
+        Assumes that the directory contains subdirectories with the period names.
+
+        Plots the average progress of all books in each period.
+        """
+        if not self.main_directory:
+            raise Exception("Not in grouped mode")
+
+        # mine the periods from all subdirectories in the directory
+        periods = []
+        for item in os.listdir(self.main_directory):
+            if os.path.isdir(os.path.join(self.main_directory, item)):
+                periods.append(item)
+
+        # sort alphabetically
+        periods.sort()
+        
+        # for each period, plot and calculate the average progress 
+        fig = plt.figure(figsize=(15, 7), dpi=200)
+        ax = fig.add_subplot(111)
+
+        for period in periods:
+            fp = os.path.join(self.main_directory, period)
+            self._load_all_logs(fp)
+            for book in self.all_books:
+                if book.valid:
+                    ax.plot(book.index, book.progress, alpha=0.1, color='gray')
+                else:
+                    print('skipped: ' + book.title + 'it\'s out of sync')
+        
+            averageprogress = self._calculate_average_progress()
+            index= np.arange(len(averageprogress))
+            ax.plot(index, averageprogress, label=period, lw=2)
+
+        #plot legend
+        ax.legend()
+
+        ax.grid(True)
+        ax.set_title(label='Average Book Progress for all periods')
+        ax.set_xlabel(xlabel='Days')
+        ax.set_ylabel(ylabel='Pages')
+
+        Plotter._disable_spines(ax)
+
+        return fig
+
 
     def _calculate_average_progress(self) -> List[int]:
         """
