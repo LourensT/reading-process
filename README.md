@@ -25,9 +25,7 @@ Beginning 2018, I wanted to take reading a bit more serious, and to motivate mys
 # Install 
 Using `uv` as package manager:
 ```bash
-uv venv # create virtual environment
-source .venv/bin/activate # activate virtual environment
-uv pip install -e .
+uv sync
 ```
 # Usage
 

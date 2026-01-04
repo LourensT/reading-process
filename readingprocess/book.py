@@ -58,6 +58,19 @@ class Book:
     given a .xlsx file, returns corresponding Book adt.
     """
 
+    def format_dates(dates: List[str | datetime]) -> List[datetime]:
+        formatted_dates = []
+        for item in dates:
+            print(item)
+            if isinstance(item, str):
+                try:
+                    formatted_dates.append(datetime.strptime(item, "%d-%m-%Y"))
+                except ValueError:
+                    formatted_dates.append(datetime.strptime(item, "%d-%m-%y"))
+            else:
+                formatted_dates.append(item)
+        return formatted_dates
+
     def from_filepath(fp, title=None):
         assert ".xlsx" in fp, "Not valid file format, requires .xlsx"
 
@@ -66,9 +79,11 @@ class Book:
             title = Book._title_from_fp(fp)
 
         # load the log
-        book_sheet = pd.read_excel(fp, sheet_name="Blad1", header=None)
+        book_sheet = pd.read_excel(fp, header=None)
         dates = book_sheet[book_sheet.columns[0]].tolist()
         progress = book_sheet[book_sheet.columns[1]].tolist()
+
+        dates = Book.format_dates(dates)
 
         # add the additional data point of 0 pages read one day before first datapoint.
         first_date = dates[0] - pd.Timedelta("1 days")
