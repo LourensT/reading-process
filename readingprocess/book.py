@@ -61,7 +61,6 @@ class Book:
     def format_dates(dates: List[str | datetime]) -> List[datetime]:
         formatted_dates = []
         for item in dates:
-            print(item)
             if isinstance(item, str):
                 if len(item.split(" ")) > 1:
                     item = item.split(" ")[0]  # in case there are extra notes after date

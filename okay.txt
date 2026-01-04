@@ -1,0 +1,79 @@
+Loading: ./logs/2025/Patriot_ Mijn verhaal - Alexei Navalny.xlsx
+Loading: ./logs/2025/Intermezzo - Sally Rooney.xlsx
+Loading: ./logs/2025/De graaf van Monte-Cristo - Alexandre Dumas.xlsx
+Loading: ./logs/2025/The Plague - Albert Camus.xlsx
+Loading: ./logs/2025/Het proces -  Franz Kafka.xlsx
+Loading: ./logs/2025/Sparks_ China_s Underground Historians and their Battle for the Future - Ian Johnson.xlsx
+Loading: ./logs/2025/Show don_t tell - Curtis Sittenfeld.xlsx
+Loading: ./logs/2025/Autobiography - John Stuart Mill.xlsx
+Loading: ./logs/2025/Intimacies - Katie Kitamura.xlsx
+Loading: ./logs/2025/Peach Blossom Spring - Mellisa Fu.xlsx
+Loading: ./logs/2025/One Child_ The Story of China_s Most Radical Experiment - Mei Fong.xlsx
+Loading: ./logs/2025/De vrije val van Vestia_ Miljardendrama door hoogmoed en wanbeleid - Hans Verbraeken.xlsx
+Loading: ./logs/2025/A Room of One’s Own - Virginia Woolf.xlsx
+Loading: ./logs/2025/The Emergence of Probability - Ian Hacking.xlsx
+Loading: ./logs/2025/De krater -  Gerwin van der Werf.xlsx
+Loading: ./logs/2025/Jenny Xie - The Rupture Tense.xlsx
+Loading: ./logs/2025/Red-Color News Soldier -Li Zhensheng.xlsx
+Loading: ./logs/2025/Focus_ De wereld van ASML - Marc Hijink.xlsx
+Loading: ./logs/2025/The Catcher in the Rye - J.D. Salinger.xlsx
+Loading: ./logs/2025/Poor Charlie’s Almanack - Charles T. Munger.xlsx
+Loading: ./logs/2025/Luister - Sacha Bronwasser.xlsx
+Loading: ./logs/2025/Middle Class Shanghai_ Reshaping U.S.-China Engagement - Cheng Li.xlsx
+Loading: ./logs/2025/Clearing the Air_ A Hopeful Guide to Solving Climate Change - Hannah Ritchie.xlsx
+Loading: ./logs/2025/Hillbilly Elegy_ A Memoir of a Family and Culture in Crisis - J.D. Vance.xlsx
+Loading: ./logs/2025/One Hundred Years of Solitude - Gabriel García Márquez.xlsx
+Loading: ./logs/2025/Doctor Zhivago - Boris Pasternak.xlsx
+Loading: ./logs/2025/Franny & Zooey - J.D. Salinger.xlsx
+=====================
+OVERVIEW OF BOOKS:
+* (1) Doctor Zhivago - Boris Pasternak
+* (2) Franny & Zooey - J.D. Salinger
+* (3) The Emergence of Probability - Ian Hacking
+* (4) Intermezzo - Sally Rooney
+* (5) Red-Color News Soldier -Li Zhensheng
+* (6) One Child: The Story of China's Most Radical Experiment - Mei Fong
+* (7) Middle Class Shanghai: Reshaping U.S.-China Engagement - Cheng Li
+* (8) Sparks: China's Underground Historians and their Battle for the Future - Ian Johnson
+* (9) Jenny Xie - The Rupture Tense
+* (10) Peach Blossom Spring - Mellisa Fu
+* (11) Poor Charlie’s Almanack - Charles T. Munger
+* (12) De krater -  Gerwin van der Werf
+* (13) Focus: De wereld van ASML - Marc Hijink
+* (14) One Hundred Years of Solitude - Gabriel García Márquez
+* (15) De vrije val van Vestia: Miljardendrama door hoogmoed en wanbeleid - Hans Verbraeken
+* (16) Intimacies - Katie Kitamura
+* (17) Autobiography - John Stuart Mill
+* (18) A Room of One’s Own - Virginia Woolf
+* (19) Het proces -  Franz Kafka
+* (20) Show don't tell - Curtis Sittenfeld
+* (21) The Plague - Albert Camus
+* (22) Hillbilly Elegy: A Memoir of a Family and Culture in Crisis - J.D. Vance
+* (23) The Catcher in the Rye - J.D. Salinger
+* (24) Clearing the Air: A Hopeful Guide to Solving Climate Change - Hannah Ritchie
+* (25) Luister - Sacha Bronwasser
+* (26) De graaf van Monte-Cristo - Alexandre Dumas
+* (27) Patriot: Mijn verhaal - Alexei Navalny
+=====================
+Statistics:
+9039 pages in total
+334.78 average pages per book
+16.41 average days per book
+
+
+reached
+./plots/2025/ timeline.png
+./plots/2025/timeline.png
+<class 'matplotlib.figure.Figure'>
+Figure saved as 'timeline.png'
+reached
+./plots/2025/ trajectories.png
+./plots/2025/trajectories.png
+<class 'matplotlib.figure.Figure'>
+Figure saved as 'trajectories.png'
+reached
+./plots/2025/ average_trajectories.png
+./plots/2025/average_trajectories.png
+<class 'matplotlib.figure.Figure'>
+Figure saved as 'average_trajectories.png'
+Processing files from './logs/2025/' to './plots/2025/'

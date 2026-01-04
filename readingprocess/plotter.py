@@ -31,12 +31,9 @@ class Plotter:
         return filenames
 
     def _load_all_logs(self, fp: str) -> None:
-        print(fp)
         self.all_books = []
 
         filepaths = self._get_list_of_logs(fp)
-
-        print(filepaths)
 
         for item in filepaths:
             print("Loading: " + item)

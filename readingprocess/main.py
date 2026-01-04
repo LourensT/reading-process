@@ -5,7 +5,12 @@ from .plotter import Plotter
 
 
 def save_plot(figure, output_dir, filename):
-    figure.savefig(os.path.join(output_dir, filename))
+    print("reached")
+    print(output_dir, filename)
+    fp = os.path.join(output_dir, filename)
+    print(fp)
+    print(type(figure))
+    figure.savefig(fp)
     print(f"Figure saved as '{filename}'")
 
 
@@ -65,6 +70,7 @@ def main():
         save_plot(
             average_trajectories_figure, args.output_dir, "average_trajectories.png"
         )
+
 
         print(f"Processing files from '{args.input_dir}' to '{args.output_dir}'")
 

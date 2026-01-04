@@ -3,7 +3,7 @@ name = "reading-process"
 version = "0.1.0"
 description = "Visualizing my reading habits"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = "==3.12"
 dependencies = [
     "matplotlib>=3.10.0",
     "numpy>=2.2.1",
@@ -11,9 +11,4 @@ dependencies = [
     "pandas>=2.2.3",
     "python-dotenv>=1.0.0",
     "mistralai>=0.0.1",
-]
-
-[dependency-groups]
-dev = [
-    "ipykernel>=6.29.5",
 ]
