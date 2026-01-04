@@ -52,7 +52,8 @@ def format_with_mistral(lines: List[str], year: int) -> List[Tuple[str, str]]:
     # Prepare prompt for Mistral
     prompt = (
         "I have unstructured reading notes in the format 'd page'. "
-        "Please extract the date and page number from each line and format them "
+        "Please extract the date and page number from each line and format them. "
+        "Note that by convention, day comes first, then month. "
         "as 'DD-MM-YY, page'. The year is provided separately, unless explicitly stated in the line. "
         "Here are the lines to process:\n\n"
     )

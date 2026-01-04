@@ -63,10 +63,14 @@ class Book:
         for item in dates:
             print(item)
             if isinstance(item, str):
-                try:
-                    formatted_dates.append(datetime.strptime(item, "%d-%m-%Y"))
-                except ValueError:
-                    formatted_dates.append(datetime.strptime(item, "%d-%m-%y"))
+                if len(item.split(" ")) > 1:
+                    item = item.split(" ")[0]  # in case there are extra notes after date
+                    formatted_dates.append(datetime.strptime(item, "%Y-%m-%d"))
+                else:
+                    try:
+                        formatted_dates.append(datetime.strptime(item, "%d-%m-%Y"))
+                    except ValueError:
+                        formatted_dates.append(datetime.strptime(item, "%d-%m-%y"))
             else:
                 formatted_dates.append(item)
         return formatted_dates
